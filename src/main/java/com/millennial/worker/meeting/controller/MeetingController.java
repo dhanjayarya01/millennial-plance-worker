@@ -25,6 +25,19 @@ public class MeetingController {
     private final NotificationService notificationService;
     private final EmailService emailService;
 
+    private LocalDateTime parseDateTime(String str) {
+        if (str == null || str.trim().isEmpty()) return null;
+        try {
+            return LocalDateTime.parse(str, DateTimeFormatter.ISO_DATE_TIME);
+        } catch (Exception e) {
+            try {
+                return java.time.OffsetDateTime.parse(str, DateTimeFormatter.ISO_DATE_TIME).toLocalDateTime();
+            } catch (Exception ex) {
+                return LocalDateTime.parse(str.replace("Z", "").substring(0, 19));
+            }
+        }
+    }
+
     @PostMapping
     public WorkerMeetingEntity scheduleMeeting(@RequestBody Map<String, Object> body) {
         log.info("Scheduling meeting: {}", body);
@@ -35,7 +48,11 @@ public class MeetingController {
         String recipientIds = (String) body.get("recipientIds");
         String recipientEmails = (String) body.get("recipientEmails");
 
-        LocalDateTime meetingTime = LocalDateTime.parse(meetingTimeStr, DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime meetingTime = parseDateTime(meetingTimeStr);
+        LocalDateTime reminderTime = null;
+        if (body.containsKey("reminderTime") && body.get("reminderTime") != null) {
+            reminderTime = parseDateTime((String) body.get("reminderTime"));
+        }
 
         WorkerMeetingEntity meeting = WorkerMeetingEntity.builder()
                 .title(title)
@@ -45,6 +62,8 @@ public class MeetingController {
                 .recipientIds(recipientIds)
                 .recipientEmails(recipientEmails)
                 .alerted1m(false)
+                .reminderTime(reminderTime)
+                .reminderAlerted(false)
                 .build();
 
         WorkerMeetingEntity saved = meetingRepository.save(meeting);

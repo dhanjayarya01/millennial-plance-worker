@@ -22,7 +22,7 @@ public class NotificationService {
     public void saveAndSendNotification(Long userId, Long taskId, String type, String title, String message) {
         log.info("Processing notification for userId: {}, taskId: {}, type: {}", userId, taskId, type);
 
-        if (notificationRepository.existsByUserIdAndTaskIdAndType(userId, taskId, type)) {
+        if (taskId != null && notificationRepository.existsByUserIdAndTaskIdAndType(userId, taskId, type)) {
             log.info("Notification of type {} already exists for userId: {} and taskId: {}. Skipping.", type, userId, taskId);
             return;
         }
@@ -76,5 +76,10 @@ public class NotificationService {
             notif.setRead(true);
         }
         notificationRepository.saveAll(unread);
+    }
+
+    @Transactional
+    public void deleteNotification(Long id) {
+        notificationRepository.deleteById(id);
     }
 }

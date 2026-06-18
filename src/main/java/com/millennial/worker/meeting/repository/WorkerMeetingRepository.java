@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface WorkerMeetingRepository extends JpaRepository<WorkerMeetingEntity, Long> {
     List<WorkerMeetingEntity> findByMeetingTimeBeforeAndAlerted1mFalse(LocalDateTime time);
+    List<WorkerMeetingEntity> findByReminderTimeBeforeAndReminderAlertedFalse(LocalDateTime time);
 }

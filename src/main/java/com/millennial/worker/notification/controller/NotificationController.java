@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/worker/notifications")
 @RequiredArgsConstructor
 @Slf4j
-@org.springframework.web.bind.annotation.CrossOrigin(origins = "*")
+@org.springframework.web.bind.annotation.CrossOrigin(origins = "*", allowedHeaders = "*", methods = {org.springframework.web.bind.annotation.RequestMethod.GET, org.springframework.web.bind.annotation.RequestMethod.POST, org.springframework.web.bind.annotation.RequestMethod.PUT, org.springframework.web.bind.annotation.RequestMethod.DELETE, org.springframework.web.bind.annotation.RequestMethod.OPTIONS})
 public class NotificationController {
 
     private final SseManager sseManager;
@@ -42,6 +42,12 @@ public class NotificationController {
     public void markAllRead(@PathVariable Long userId) {
         log.info("Marking all notifications as read for userId: {}", userId);
         notificationService.markAllAsReadForUser(userId);
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/{id}")
+    public void deleteNotification(@PathVariable Long id) {
+        log.info("Deleting notification ID: {}", id);
+        notificationService.deleteNotification(id);
     }
 
     @org.springframework.web.bind.annotation.PostMapping

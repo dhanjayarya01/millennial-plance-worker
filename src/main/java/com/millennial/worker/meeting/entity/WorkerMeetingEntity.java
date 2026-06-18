@@ -36,4 +36,11 @@ public class WorkerMeetingEntity {
 
     @Column(name = "alerted_1m", nullable = false)
     private boolean alerted1m;
+
+    @Column(name = "reminder_time")
+    private LocalDateTime reminderTime;
+
+    @Column(name = "reminder_alerted", nullable = false)
+    @Builder.Default
+    private boolean reminderAlerted = false;
 }
