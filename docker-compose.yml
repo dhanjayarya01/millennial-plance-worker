@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: millennial-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: millennial_db
+      MYSQL_USER: millennial
+      MYSQL_PASSWORD: millennial_pass
+      MYSQL_ROOT_PASSWORD: root_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: millennial-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  maildev:
+    image: maildev/maildev
+    container_name: millennial-maildev
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+
+  worker:
+    build: .
+    container_name: millennial-plance-worker
+    depends_on:
+      - mysql
+      - redis
+      - maildev
+    ports:
+      - "8081:8081"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: millennial_db
+      MYSQL_USER: millennial
+      MYSQL_PASSWORD: millennial_pass
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SMTP_HOST: maildev
+      SMTP_PORT: 1025
+      SMTP_FROM: no-reply@millennial.com
+
+volumes:
+  mysql_data:
+  redis_data:
